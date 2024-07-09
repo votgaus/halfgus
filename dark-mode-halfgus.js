@@ -39,12 +39,12 @@ function colorModeToggle() {
   let lightColors = {};
   let darkColors = {};
   cssVariables.split(",").forEach(function (item) {
-    let lightValue = computed.getPropertyValue(`--color--${item}`);
-    let darkValue = computed.getPropertyValue(`--dark--${item}`);
+    let lightValue = computed.getPropertyValue(--color--${item});
+    let darkValue = computed.getPropertyValue(--dark--${item});
     if (lightValue.length) {
       if (!darkValue.length) darkValue = lightValue;
-      lightColors[`--color--${item}`] = lightValue;
-      darkColors[`--dark--${item}`] = darkValue;
+      lightColors[--color--${item}] = lightValue;
+      darkColors[--color--${item}] = darkValue;
     }
   });
 
@@ -86,8 +86,20 @@ function colorModeToggle() {
     }
   }
 
-  // Always default to light mode
-  goDark(false, false);
+  function checkPreference(e) {
+    goDark(e.matches, false);
+  }
+  const colorPreference = window.matchMedia("(prefers-color-scheme: dark)");
+  colorPreference.addEventListener("change", (e) => {
+    checkPreference(e);
+  });
+
+  let storagePreference = localStorage.getItem("dark-mode");
+  if (storagePreference !== null) {
+    storagePreference === "true" ? goDark(true, false) : goDark(false, false);
+  } else {
+    checkPreference(colorPreference);
+  }
 
   window.addEventListener("DOMContentLoaded", (event) => {
     toggleEl = document.querySelectorAll("[tr-color-toggle]");
